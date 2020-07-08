@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  route53-backup
+
+  SAM Template for route53-backup
+
+Globals:
+  Function:
+    Timeout: 900
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dns_backup/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          s3_bucket_name: !Ref bucketName
+          s3_bucket_region: us-east-1
+      Policies:
+        - Statement:
+            - Sid: AllowRoute53ListHostedZones
+              Effect: Allow
+              Action:
+                - route53:GetHostedZone
+                - route53:ListHostedZones
+                - route53:ListHostedZonesByName
+              Resource: "*"
+            - Sid: AllowRoute53RecordSetsList
+              Effect: Allow
+              Action:
+                - route53:ListResourceRecordSets
+                - route53:GetChange
+              Resource: "*"
+            - Sid: AllowS3FullAccess
+              Effect: Allow
+              Action:
+                - s3:*
+              Resource: "arn:aws:s3:::dns-backup*"
+            - Sid: AllowS3List
+              Effect: Allow
+              Action:
+                - s3:ListAllMyBuckets
+                - s3:ListBucket
+                - s3:GetBucketLocation
+              Resource: "*"
+
+Parameters:
+  bucketName:
+    Description: Name of the bucket where the recordsets will be stored (will be created if non-existant)
+    Type: String
