@@ -10,7 +10,7 @@ Globals:
     Timeout: 900
 
 Resources:
-  HelloWorldFunction:
+  DNSbackupLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dns_backup/
